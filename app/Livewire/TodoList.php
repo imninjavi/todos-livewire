@@ -62,16 +62,22 @@ class TodoList extends Component
 
     public function update()
     {
-        $validated = $this->validate([
-            'editingTodoName' => 'required|min:3|max:50'
-        ]);
+        try {
+            $validated = $this->validate([
+                'editingTodoName' => 'required|min:3|max:50'
+            ]);
+    
+            $todo = Todo::findOrFail($this->editingTodoID);
+            
+            $todo->name = $validated['editingTodoName'];
+            $todo->save();
+    
+            $this->cancelEdit();
 
-        $todo = Todo::find($this->editingTodoID);
+        } catch (Exception $e) {
+            session()->flash('error','Failed to update todo!');
+        }
         
-        $todo->name = $validated['editingTodoName'];
-        $todo->save();
-
-        $this->cancelEdit();
     }
 
     public function cancelEdit()
